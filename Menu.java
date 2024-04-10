@@ -5,46 +5,35 @@ import java.util.Set;
 
 public class Menu {
     //fields
-    private final List<Coffee> allCoffees = new ArrayList<>();
+    private final Set<Beverage> allBeverages = new HashSet<>();
 
     //default constructor used, therefore no need to declare it
 
     //methods
     /**
-     * method to add a menu Coffee object to the database (allCoffees)
-     * @param coffee a menu Coffee object
+     * method to add a menu Beverage object to the database (allBeverages)
+     * @param beverage a Beverage object
      */
-    public void addItem(Coffee coffee){
-        this.allCoffees.add(coffee);
+    public void addItem(Beverage beverage){
+        allBeverages.add(beverage);
     }
 
     /**
-     * returns a collection of Coffee objects that meet all the customer's criteria
-     * @param userCoffee a Coffee object representing a user's preferred Coffee
+     * returns a collection of Beverage objects that meet all the customer's criteria
+     * @param userBeverage a Beverage object representing a user's preferred Beverage
      * @return a collection list of matching Coffee objects
      * this method was sourced and adapted from COSC120 Lecture 4 AllGeeks.java findDreamGeek
      */
-    public List<Coffee> findMatch(Coffee userCoffee){
-        List<Coffee> matchingCoffees = new ArrayList<>();
-        for(Coffee coffee : this.allCoffees){
-            // check if the menu item contains user's chosen milk
-            if(!coffee.getMilks().containsAll(userCoffee.getMilks())) continue;
-            // check if the menu item sugar choice is same with user coffee sugar choice
-            if(!coffee.getSugar().equals(userCoffee.getSugar())) continue;
-            // check if the menu item number of shots is the same with user coffee number of shots
-            if(coffee.getNumberOfShots() != userCoffee.getNumberOfShots()) continue;
-            // check if the menu item has extra/s that is common with the user chosen extra/s
-            if(userCoffee.getExtras().size()!=0) {
-                Set<String> extrasInCommon = new HashSet<>(userCoffee.getExtras());
-                extrasInCommon.retainAll(coffee.getExtras());
-                if(extrasInCommon.size()==0) continue;
-            }
-            // check if the menu coffee price is in the same range with the user price range
-            if(coffee.getPrice()<userCoffee.getMinPrice() || coffee.getPrice()>userCoffee.getMaxPrice()) continue;
-            // if pass all check, add the menu coffee to the matchingCoffees list
-            matchingCoffees.add(coffee);
+    public List<Beverage> findDreamBeverage(DreamBeverage dreamBeverage){
+        List<Beverage> matches = new ArrayList<>();
+        for(Beverage beverage : allBeverages){
+            DreamBeverage genericFeatures = beverage.getGenericFeatures();
+            // check if the menu beverage price is in the same range with the user price range
+            if(beverage.getPrice()< dreamBeverage.getMinPrice() || beverage.getPrice()> dreamBeverage.getMaxPrice()) continue;
+            if(dreamBeverage.matches(genericFeatures)) matches.add(beverage);
+
         }
-        // return the collection of matching menu coffee
-        return matchingCoffees;
+        // return the collection of matching menu beverage
+        return matches;
     }
 }

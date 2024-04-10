@@ -22,24 +22,24 @@ public class MenuSearcher {
         menu = loadItems();
 
         JOptionPane.showMessageDialog(null, "Welcome to The Caffeinated Geek!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
-        Coffee userCoffee = getUserCriteria();
-        List<Coffee> matchCoffees = menu.findMatch(userCoffee);
-        if(matchCoffees.size()>0){ //if the list is not empty
+        Beverage userBeverage = getUserCriteria();
+        List<Beverage> matchBeverages = menu.findDreamBeverage(userBeverage);
+        if(matchBeverages.size()>0){ //if the list is not empty
             //this will map the item names and item ID to the corresponding Item objects
-            Map<String, Coffee> options = new HashMap<>();
+            Map<String, Beverage> options = new HashMap<>();
             //build a text description of the menu items for the user to view
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following items meet your criteria:\n");
-            for (Coffee matchCoffee : matchCoffees) {
-                StringBuilder displayMenu = matchCoffee.displayMenu();
+            for (Beverage matchBeverage : matchBeverages) {
+                StringBuilder displayMenu = matchBeverage.displayMenu();
                 infoToShow.append("\n").append(displayMenu);
-                options.put(matchCoffee.getItemName() + " (" + matchCoffee.getItemId() + ")", matchCoffee);
+                options.put(matchBeverage.getItemName() + " (" + matchBeverage.getItemId() + ")", matchBeverage);
             }
             String order = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease select which menu item you would like to order",appName, JOptionPane.QUESTION_MESSAGE,icon,options.keySet().toArray(), "");
             if(order==null) System.exit(0);
             else{
-                Coffee chosenCoffee = options.get(order);
+                Beverage chosenBeverage = options.get(order);
                 Geek customer = getGeekDetails();
-                writeOrderToFile(customer, chosenCoffee, userCoffee);
+                writeOrderToFile(customer, chosenBeverage, userBeverage);
                 JOptionPane.showMessageDialog(null, "Thank you! Your order has been placed. " +
                         "We will bring your coffee out shortly.", appName, JOptionPane.QUESTION_MESSAGE, icon);
             }
@@ -54,7 +54,7 @@ public class MenuSearcher {
      * @return a Coffee object that have the user's criteria
      * this method was sourced and adapted from COSC120 Tutorial 4 FindADog.java getUserCriteria
      */
-    private static Coffee getUserCriteria(){
+    private static Beverage getUserCriteria(){
 
         Milk milk = (Milk) JOptionPane.showInputDialog(null,"What milk type would you like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE,icon,Milk.values(),Milk.WHOLE);
         if(milk==null) System.exit(0);
@@ -120,11 +120,11 @@ public class MenuSearcher {
             if(maxPrice<minPrice) JOptionPane.showMessageDialog(null,"Max price must be >= min price.");
         }
 
-        Coffee userCoffee = new Coffee(0, "", 0, numberOfShots, sugar, milks, extras, "");
-        userCoffee.setMinPrice(minPrice);
-        userCoffee.setMaxPrice(maxPrice);
+        Beverage userBeverage = new Beverage(0, "", 0, numberOfShots, sugar, milks, extras, "");
+        userBeverage.setMinPrice(minPrice);
+        userBeverage.setMaxPrice(maxPrice);
 
-        return userCoffee;
+        return userBeverage;
     }
 
     /**
@@ -182,8 +182,8 @@ public class MenuSearcher {
 
             String description = elements[3].replace("]", "");
 
-            Coffee coffee = new Coffee(itemId, itemName, price, numberOfShots, sugar, milks, extras, description);
-            menu.addItem(coffee);
+            Beverage beverage = new Beverage(itemId, itemName, price, numberOfShots, sugar, milks, extras, description);
+            menu.addItem(beverage);
         }
         return menu;
     }
@@ -191,10 +191,10 @@ public class MenuSearcher {
     /**
      * a method to write the order details of a geek to a file, including the geek details (name, phone number) and the geek chosen coffee drink details
      * @param geek the Geek object that has the details of the geek who placed the order
-     * @param chosenCoffee the Coffee object that has the details of the chosen coffee that the geek wants
-     * @param userCoffee the Coffee object that has some details needed for the order (e.g. milk choice)
+     * @param chosenBeverage the Coffee object that has the details of the chosen coffee that the geek wants
+     * @param userBeverage the Coffee object that has some details needed for the order (e.g. milk choice)
      */
-    private static void writeOrderToFile(Geek geek, Coffee chosenCoffee, Coffee userCoffee) {
+    private static void writeOrderToFile(Geek geek, Beverage chosenBeverage, Beverage userBeverage) {
         String filePath = "./Assignment1/order_" + geek.phoneNumber() + ".txt";
         Path path = Path.of(filePath);
         /* Order details:
@@ -203,11 +203,11 @@ public class MenuSearcher {
         Item: Mocha (30213)
         Milk: Full-cream */
 
-        String milkChoice = Arrays.toString(userCoffee.getMilks().toArray()).replace("[", "").replace("]","");
+        String milkChoice = Arrays.toString(userBeverage.getMilks().toArray()).replace("[", "").replace("]","");
         String lineToWrite = "Order details:\n" +
                 "Name: " + geek.name() + "\n" +
                 "Order number: " + geek.phoneNumber() + "\n" +
-                "Item: " + chosenCoffee.getItemName() + " (" + chosenCoffee.getItemId() + ")\n" +
+                "Item: " + chosenBeverage.getItemName() + " (" + chosenBeverage.getItemId() + ")\n" +
                 "Milk: " + milkChoice;
 
         try {
