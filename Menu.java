@@ -20,8 +20,8 @@ public class Menu {
 
     /**
      * returns a collection of Beverage objects that meet all the customer's criteria
-     * @param userBeverage a Beverage object representing a user's preferred Beverage
-     * @return a collection list of matching Coffee objects
+     * @param dreamBeverage a Beverage object representing a user's preferred Beverage
+     * @return a collection list of matching Beverage objects
      * this method was sourced and adapted from COSC120 Lecture 4 AllGeeks.java findDreamGeek
      */
     public List<Beverage> findDreamBeverage(DreamBeverage dreamBeverage){

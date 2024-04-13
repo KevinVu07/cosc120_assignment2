@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 
 public class MenuSearcher {
     // fields
-    private static final String filePath = "./Assignment1/src/menu.txt";
+    private static final String filePath = "./assignment2/menu.txt";
     private final static String appName = "The Caffeinated Geek";
     private static Menu menu;
-    private final static String iconPath = "./Assignment1/src/icon.png";
+    private final static String iconPath = "./assignment2/icon.png";
     static ImageIcon icon = new ImageIcon(iconPath);
 
     /**
@@ -19,10 +19,14 @@ public class MenuSearcher {
      * @param args none required
      */
     public static void main(String[] args) {
+        // load all items from menu.txt to a Menu object
         menu = loadItems();
 
         JOptionPane.showMessageDialog(null, "Welcome to The Caffeinated Geek!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
+
+        // Create a Beverage object userBeverage with preferred criteria input from the user
         Beverage userBeverage = getUserCriteria();
+
         List<Beverage> matchBeverages = menu.findDreamBeverage(userBeverage);
         if(matchBeverages.size()>0){ //if the list is not empty
             //this will map the item names and item ID to the corresponding Item objects
@@ -58,7 +62,7 @@ public class MenuSearcher {
 
         Milk milk = (Milk) JOptionPane.showInputDialog(null,"What milk type would you like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE,icon,Milk.values(),Milk.WHOLE);
         if(milk==null) System.exit(0);
-        List<Milk> milks= new ArrayList<>();
+        Set<Milk> milks= new HashSet<>();
         milks.add(milk);
 
         Sugar sugar = Sugar.valueOf("NO");
@@ -127,6 +131,108 @@ public class MenuSearcher {
         return userBeverage;
     }
 
+
+    private static DreamBeverage searchForBeverage(TypeOfBeverage type){
+        int numberOfShots = 0;
+        int temperature = 0;
+        int steepingTime = 0;
+        if (type == TypeOfBeverage.BEVERAGE) {
+            Integer[] numberOfShotsOptions = {1, 2, 3};
+
+            while(numberOfShots<1) {
+                numberOfShots = (int) JOptionPane.showInputDialog(null,"How many shots you would like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE, icon, numberOfShotsOptions, numberOfShotsOptions[0]);
+            }
+        } else if (type == TypeOfBeverage.TEA) {
+            String[] tempOptions = {"80 degrees: For a mellow, gentler taste", "85 degrees: For slightly sharper than mellow", "90 degrees: Balanced, strong but not too strong", "95 degrees: Strong, but not acidic", "100 degrees: For a bold, strong flavour"};
+            while(temperature < 1) {
+                String response = (String) JOptionPane.showInputDialog(null, "Which temperature would you like for your tea?", appName, JOptionPane.QUESTION_MESSAGE, icon, tempOptions, tempOptions[0]);
+                // use switch case to assign proper values to the temperature variable
+                // to do
+            }
+        }
+
+        Map<Criteria,Object> criteriaMap = new HashMap<>();
+        //EDIT 13: add the user's preferred type of relationship to the map
+        criteriaMap.put(Criteria.TYPE_OF_RELATIONSHIP,type);
+
+        StarSign starSign = (StarSign) JOptionPane.showInputDialog(null,"Please select your preferred star sign: ",
+                appName, JOptionPane.QUESTION_MESSAGE,icon,StarSign.values(),StarSign.CAPRICORN);
+        if(starSign==null) System.exit(0);
+        if(!starSign.equals(StarSign.NA)) criteriaMap.put(Criteria.STAR_SIGN,starSign);
+
+        Gender gender = (Gender) JOptionPane.showInputDialog(null,"Please select your preferred gender: ",appName, JOptionPane.QUESTION_MESSAGE,icon,Gender.values(),Gender.OTHER);
+        if(gender==null) System.exit(0);
+        //EDIT 2: only add the user’s Gender selection to the criteria Map if it is not NA.
+        if(!gender.equals(Gender.NA)) criteriaMap.put(Criteria.GENDER,gender);
+
+        if(type==TypeOfDreamGeek.STUDY_BUDDY) {
+            String[] options = {"Institution and course", "Subject area"};
+            String selectedOption = (String) JOptionPane.showInputDialog(null, "How would you like to search for a study buddy?",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, options, "");
+            if (selectedOption.equals(options[0])) {
+                String institution = (String) JOptionPane.showInputDialog(null, "Please enter the institution you're interested in: ",
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+                if(institution==null) System.exit(0);
+                institution=institution.toLowerCase();
+                String course = (String) JOptionPane.showInputDialog(null, "Please enter the course you're interested in: ",
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+                if(course==null) System.exit(0);
+                course=course.toLowerCase();
+                criteriaMap.put(Criteria.INSTITUTION,institution);
+                criteriaMap.put(Criteria.COURSE,course);
+            } else {
+                String subjectArea = (String) JOptionPane.showInputDialog(null, "Please enter your subject area: ",
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+                if(subjectArea==null) System.exit(0);
+                subjectArea=subjectArea.toUpperCase();
+                criteriaMap.put(Criteria.SUBJECT_AREA,subjectArea);
+            }
+        }
+        //EDIT 9: add an else if(OldSchoolFriend statement), and request user input for
+        // school and graduation year. Add these to the Map.
+        else if(type==TypeOfDreamGeek.OLD_SCHOOL_FRIEND){
+            String school = (String) JOptionPane.showInputDialog(null, "At what school did your old friend attend? ",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            if(school==null) System.exit(0);
+            criteriaMap.put(Criteria.SCHOOL,school);
+            //add error catching and input validation, e.g. year must start with 19 or 20 and be 4 digits long.
+            String graduationYear = (String) JOptionPane.showInputDialog(null, "During which year did your old friend graduate? ",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            if(graduationYear==null) System.exit(0);
+            criteriaMap.put(Criteria.GRADUATION_YEAR,graduationYear);
+        }
+        else{
+            Religion religion = (Religion) JOptionPane.showInputDialog(null,"Please select your preferred religion:",
+                    appName, JOptionPane.QUESTION_MESSAGE,icon,Religion.values(),Religion.UNAFFILIATED);
+            if(religion==null) System.exit(0);
+            if(!religion.equals(Religion.NA)) criteriaMap.put(Criteria.RELIGION,religion);
+
+            Set<String> favouriteGames = getUserFavouriteCollection("playing computer games","game");
+            if(favouriteGames.size()!=0) criteriaMap.put(Criteria.FAVOURITE_COMPUTER_GAMES,favouriteGames);
+
+            Set<String> favouriteTVShows = getUserFavouriteCollection("binging tv shows","tv show");
+            if(favouriteTVShows.size()!=0) criteriaMap.put(Criteria.FAVOURITE_TV_SHOWS,favouriteTVShows);
+
+            //EDIT 6: use our good design to easily get user hobby data
+            Set<String> hobbies = getUserFavouriteCollection("hobbies","hobby");
+            if(hobbies.size()!=0) criteriaMap.put(Criteria.HOBBIES,hobbies);
+
+            if(type.equals(TypeOfDreamGeek.MORE_THAN_A_FRIEND)){
+                ValentinesGifts valentinesGift = (ValentinesGifts) JOptionPane.showInputDialog(null, "The kind of Valentine's gift a Geek loves " +
+                                "says a lot about their personality. From the list, which would you be most likely to buy for your dream geek on Valentine's Day?",
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, ValentinesGifts.values(), ValentinesGifts.CHESS_SET);
+                if(valentinesGift==null) System.exit(0);
+                criteriaMap.put(Criteria.VALENTINES_GIFT,valentinesGift);
+
+                RomanticActivities favouriteRomanticActivity = (RomanticActivities) JOptionPane.showInputDialog(null, "Select your favourite " +
+                        "romantic activity from the list.", appName, JOptionPane.QUESTION_MESSAGE, icon, RomanticActivities.values(), RomanticActivities.BINGE_TV_SHOWS);
+                if(favouriteRomanticActivity==null) System.exit(0);
+                criteriaMap.put(Criteria.ROMANTIC_ACTIVITY,favouriteRomanticActivity);
+            }
+        }
+        return new DreamGeek(minAge,maxAge,criteriaMap);
+    }
+
     /**
      * method to load all menu items from dataset menu.txt
      * @return a Menu object that has a list allCoffees containing all the coffees from the menu.txt dataset
@@ -146,15 +252,62 @@ public class MenuSearcher {
 
         for (int i=1;i<itemData.size();i++) {
             String[] elements = itemData.get(i).split("\\[");
-            String[] itemInfo = elements[0].split(",");
-            long itemId = Long.parseLong(itemInfo[0]);
-            String itemName = itemInfo[1].trim();
-            float price = Float.parseFloat(itemInfo[2]);
-            int numberOfShots = Integer.parseInt(itemInfo[3]);
-            Sugar sugar = Sugar.valueOf(itemInfo[4].trim().toUpperCase());
+            String[] itemInfo = elements[0].split(","); // [type, menu item ID, menu item name, price, numberOfShots, temperature, steeping time, sugar]
+            TypeOfBeverage typeOfBeverage = null;
+            try {
+                typeOfBeverage = TypeOfBeverage.valueOf(itemInfo[0].trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("There is an error with the argument passed in the TypeOfBeverage.valueOf() method");
+            }
+            long itemId = -1;
+            try {
+                itemId = Long.parseLong(itemInfo[1]);
+            } catch (NumberFormatException e) {
+                System.out.println("There is an error trying to import a beverage item ID. Terminating.\nError message: "+e.getMessage());
+                System.exit(0);
+            }
+            String itemName = itemInfo[2].trim();
+            float price = -1;
+            try {
+                price = Float.parseFloat(itemInfo[3]);
+            } catch (NumberFormatException e) {
+                System.out.println("There is an error trying to import an item price. Terminating.\nError message: "+e.getMessage());
+                System.exit(0);
+            }
+            int numberOfShots = -1;
+            if (typeOfBeverage == TypeOfBeverage.BEVERAGE) {
+                try {
+                    numberOfShots = Integer.parseInt(itemInfo[4]);
+                } catch (NumberFormatException e) {
+                    System.out.println("There is an error trying to import an item number of shots. Terminating.\nError message: "+e.getMessage());
+                    System.exit(0);
+                }
+            }
+            int temperature = -1;
+            int steepingTime = -1;
+            if (typeOfBeverage == TypeOfBeverage.TEA) {
+                try {
+                    temperature = Integer.parseInt(itemInfo[5]);
+                } catch (NumberFormatException e) {
+                    System.out.println("There is an error trying to import a tea temperature. Terminating.\nError message: "+e.getMessage());
+                    System.exit(0);
+                }
+                try {
+                    steepingTime = Integer.parseInt(itemInfo[6]);
+                } catch (NumberFormatException e) {
+                    System.out.println("There is an error trying to import a tea steeping time. Terminating.\nError message: "+e.getMessage());
+                    System.exit(0);
+                }
+            }
+            Sugar sugar = null;
+            try {
+                sugar = Sugar.valueOf(itemInfo[7].trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("There is an error with the argument passed in the Sugar.valueOf() method");
+            }
 
             String[] milksString = elements[1].replace("],","").split(",");
-            List<Milk> milks = new ArrayList<>();
+            Set<Milk> milks = new HashSet<>();
             for (String milkString:milksString) {
                 Milk milk = Milk.OAT;
                 if (milkString.equals("Full-cream")) {
@@ -182,11 +335,22 @@ public class MenuSearcher {
 
             String description = elements[3].replace("]", "");
 
-            Beverage beverage = new Beverage(itemId, itemName, price, numberOfShots, sugar, milks, extras, description);
+            Map<Criteria,Object> criteriaMap = new LinkedHashMap<>();
+            if (numberOfShots >= 0) criteriaMap.put(Criteria.NUMBER_OF_SHOTS, numberOfShots);
+            if (temperature >= 0) criteriaMap.put(Criteria.TEMPERATURE, temperature);
+            if (steepingTime >= 0) criteriaMap.put(Criteria.STEEPING_TIME, steepingTime);
+            criteriaMap.put(Criteria.SUGAR, sugar);
+            criteriaMap.put(Criteria.MILK_LIST, milks);
+            criteriaMap.put(Criteria.EXTRAS, extras);
+
+            DreamBeverage dreamBeverage = new DreamBeverage(criteriaMap);
+            Beverage beverage = new Beverage(itemId, itemName, price, description, dreamBeverage);
+
             menu.addItem(beverage);
         }
         return menu;
     }
+
 
     /**
      * a method to write the order details of a geek to a file, including the geek details (name, phone number) and the geek chosen coffee drink details
