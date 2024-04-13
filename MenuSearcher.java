@@ -62,8 +62,6 @@ public class MenuSearcher {
 
         Milk milk = (Milk) JOptionPane.showInputDialog(null,"What milk type would you like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE,icon,Milk.values(),Milk.WHOLE);
         if(milk==null) System.exit(0);
-        Set<Milk> milks= new HashSet<>();
-        milks.add(milk);
 
         Sugar sugar = Sugar.valueOf("NO");
         int sugarChoice = JOptionPane.showConfirmDialog(null,"Would you like to add sugar?",appName, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
@@ -137,18 +135,109 @@ public class MenuSearcher {
         int temperature = 0;
         int steepingTime = 0;
         if (type == TypeOfBeverage.BEVERAGE) {
+            // coffee number of shots
             Integer[] numberOfShotsOptions = {1, 2, 3};
-
-            while(numberOfShots<1) {
+            while(numberOfShots < 1) {
                 numberOfShots = (int) JOptionPane.showInputDialog(null,"How many shots you would like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE, icon, numberOfShotsOptions, numberOfShotsOptions[0]);
             }
         } else if (type == TypeOfBeverage.TEA) {
-            String[] tempOptions = {"80 degrees: For a mellow, gentler taste", "85 degrees: For slightly sharper than mellow", "90 degrees: Balanced, strong but not too strong", "95 degrees: Strong, but not acidic", "100 degrees: For a bold, strong flavour"};
+            // tea temperature
+            String[] tempOptions = {"80 degrees: For a mellow, gentler taste", "85 degrees: For slightly sharper than mellow", "90 degrees: Balanced, strong but not too strong", "95 degrees: Strong, but not acidic", "100 degrees: For a bold, strong flavour", "SKIP: any will do"};
             while(temperature < 1) {
                 String response = (String) JOptionPane.showInputDialog(null, "Which temperature would you like for your tea?", appName, JOptionPane.QUESTION_MESSAGE, icon, tempOptions, tempOptions[0]);
                 // use switch case to assign proper values to the temperature variable
-                // to do
+                if (!response.equals("SKIP: any will do")) {
+                    switch (response) {
+                        case "80 degrees: For a mellow, gentler taste" -> temperature = 80;
+                        case "85 degrees: For slightly sharper than mellow" -> temperature = 85;
+                        case "90 degrees: Balanced, strong but not too strong" -> temperature = 90;
+                        case "95 degrees: Strong, but not acidic" -> temperature = 95;
+                        case "100 degrees: For a bold, strong flavour" -> temperature = 100;
+                    }
+                } else {
+                    break;
+                }
             }
+
+            // tea steeping time
+            String[] steepingTimeOptions = {"1", "2", "3", "4", "5", "6", "7", "8", "SKIP: any will do"};
+            while(steepingTime < 1) {
+                String response = (String) JOptionPane.showInputDialog(null, "How long would you like the steeping time to be for your tea?", appName, JOptionPane.QUESTION_MESSAGE, icon, steepingTimeOptions, steepingTimeOptions[0]);
+                // use switch case to assign proper values to the steeping time variable
+                if (!response.equals("SKIP: any will do")) {
+                    switch (response) {
+                        case "1" -> steepingTime = 1;
+                        case "2" -> steepingTime = 2;
+                        case "3" -> steepingTime = 3;
+                        case "4" -> steepingTime = 4;
+                        case "5" -> steepingTime = 5;
+                        case "6" -> steepingTime = 6;
+                        case "7" -> steepingTime = 7;
+                        case "8" -> steepingTime = 8;
+                    }
+                } else {
+                    break;
+                }
+            }
+            }
+
+            // Common criteria for both coffee and tea
+        Milk milk = (Milk) JOptionPane.showInputDialog(null,"What milk type would you like in your coffee?",appName, JOptionPane.QUESTION_MESSAGE,icon,Milk.values(),Milk.WHOLE);
+        if(milk==null) System.exit(0);
+
+            // Get all the extras options from the menu.txt file
+        Menu menu = new Menu();
+        Path path = Path.of(filePath);
+
+        List<String> itemData = null;
+        try{
+            itemData = Files.readAllLines(path);
+        }catch (IOException io){
+            System.out.println("The file could not be loaded. Check file path is correct. Terminating.\nError message: "+io.getMessage());
+            System.exit(0);
+        }
+
+
+        Set<String> coffeeExtras = new HashSet<>();
+        Set<String> teaExtras = new HashSet<>();
+        for (int i=1;i<itemData.size();i++) {
+            String[] elements = itemData.get(i).split("\\[");
+            String[] extraString = elements[2].replace("],", "").trim().toLowerCase().split(",");
+            for (String extra : extraString) {
+                extra = extra.trim();
+                // check if type of beverage is coffee or tea, and then add the extra option to the coffee or tea extras hash sets accordingly
+                String[] itemInfo = elements[0].split(",");
+                String typeOfBeverage = itemInfo[0];
+                if (typeOfBeverage.equals("beverage")) {
+                    coffeeExtras.add(extra);
+                } else if (typeOfBeverage.equals("tea")) {
+                    teaExtras.add(extra);
+                }
+            }
+        }
+
+        // show different extras options depending on if the user chose "tea" or "coffee" at the start of the program
+        // to do
+        if (type == TypeOfBeverage.BEVERAGE) {
+
+        }
+        String extra = JOptionPane.showInputDialog(null, "What extra ingredient would you like to add to your coffee (syrups, ice cream, cream, etc)?. Enter d to finish your extras input.");
+        if (extra == null) {
+            System.exit(0);
+        }
+        while (!extra.equals("d")) {
+            extra = extra.trim().toLowerCase();
+            extras.add(extra);
+            extra = JOptionPane.showInputDialog(null, "Any other extra would you like? When finish, enter d to complete extras input.");
+        }
+
+        Sugar sugar = Sugar.valueOf("NO");
+        int sugarChoice = JOptionPane.showConfirmDialog(null,"Would you like to add sugar?",appName, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, icon);
+        if (sugarChoice == 0) {
+            sugar = Sugar.valueOf("YES");
+        }
+
+
         }
 
         Map<Criteria,Object> criteriaMap = new HashMap<>();
@@ -428,3 +517,4 @@ public class MenuSearcher {
         return matcher.matches();
     }
 }
+
