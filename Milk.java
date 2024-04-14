@@ -1,5 +1,5 @@
 public enum Milk {
-    WHOLE, SKIM, SOY, ALMOND, OAT, COCONUT, NONE;
+    WHOLE, SKIM, SOY, ALMOND, OAT, COCONUT, NONE, I_DONT_MIND;
 
     /**
      * @return a prettified version of the relevant enum constant
@@ -14,6 +14,7 @@ public enum Milk {
             case OAT -> prettified = "Oat";
             case COCONUT -> prettified = "Coconut";
             case NONE -> prettified = "None";
+            case I_DONT_MIND -> prettified = "I don't mind";
         }
         return prettified;
     }
