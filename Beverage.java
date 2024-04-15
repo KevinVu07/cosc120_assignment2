@@ -52,7 +52,7 @@ public class Beverage {
     public StringBuilder displayMenu() {
         StringBuilder displayMenu = new StringBuilder();
         String priceString = formatPrice(this.getPrice());
-        displayMenu = displayMenu.append(this.getItemName()).append(" (").append(this.getItemId()).append(")\n").append(this.getDescription()).append("\n").append("Ingredients:\n").append(this.genericFeatures.getDescription()).append("\nPrice: " + priceString).append("\n\n");
+        displayMenu = displayMenu.append(this.getItemName()).append(" (").append(this.getItemId()).append(")\n").append(this.getDescription()).append("\n").append("Ingredients:").append(this.genericFeatures.getDescription()).append("\nPrice: " + priceString).append("\n\n");
         return displayMenu;
     }
 

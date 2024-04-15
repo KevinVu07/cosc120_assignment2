@@ -96,35 +96,20 @@ public class MenuSearcher {
         // Common criteria for both coffee and tea
         Milk milk = (Milk) JOptionPane.showInputDialog(null, "What milk type would you like in your coffee?", appName, JOptionPane.QUESTION_MESSAGE, icon, Milk.values(), Milk.WHOLE);
         if (milk == null) System.exit(0);
-        // only add the user’s milk selection to the criteria Map if it is not I dont mind.
+        // only add the user’s milk selection to the criteria Map if it is not I don't mind.
         if (!milk.equals(Milk.I_DONT_MIND)) criteriaMap.put(Criteria.MILK, milk);
 
         // Sugar choice
         Sugar sugar = (Sugar) JOptionPane.showInputDialog(null, "Would you like sugar with your drink?", appName, JOptionPane.QUESTION_MESSAGE, icon, Sugar.values(), Sugar.values()[0]);
         if (sugar == null) System.exit(0);
-        // only add the user’s sugar selection to the criteria Map if it is not I dont mind.
+        // only add the user’s sugar selection to the criteria Map if it is not I don't mind.
         if (!sugar.equals(Sugar.I_DONT_MIND)) criteriaMap.put(Criteria.SUGAR, sugar);
 
-        // Extra/s choice
-        // Get all the extras options from the menu.txt file, separating into 2 different sets for coffee and tea
-        Set<String> coffeeExtras = loadExtraOptions("beverage");
-        Set<String> teaExtras = loadExtraOptions("tea");
-        // convert the 2 sets above to array to be used in Joptionpane input below
-        Object[] coffeeExtrasOptions = coffeeExtras.toArray();
-        Object[] teaExtrasOptions = teaExtras.toArray();
+        // Extra/s choice entered by the user
+        Set<String> userExtras = getUserExtras(type.toString());
 
-        Set<String> userExtras = new HashSet<>();
-        // show different extras options depending on if the user chose "tea" or "coffee" at the start of the program
-        if (type == TypeOfBeverage.BEVERAGE) {
-            String response = (String) JOptionPane.showInputDialog(null, "Which extra/s would you like for your coffee? (choose \"Finish\" or \"SKIP\" to complete this selection)", appName, JOptionPane.QUESTION_MESSAGE, icon, coffeeExtrasOptions, coffeeExtrasOptions[0]);
-            while (!response.equals("Finish") || !response.equals("SKIP: any will do")) {
-                userExtras.add(response);
-                coffeeExtras.remove(response); // remove the extra option the user just selected off the list of extra offered to the user
-                coffeeExtrasOptions = coffeeExtras.toArray();
-                response = (String) JOptionPane.showInputDialog(null, "Any other extra would you like for your coffee?", appName, JOptionPane.QUESTION_MESSAGE, icon, coffeeExtrasOptions, coffeeExtrasOptions[0]);
-            }
-        }
-        if (userExtras.size() > 0) criteriaMap.put(Criteria.EXTRAS, userExtras);
+        // if user has preference for extra, add extra options chosen to the criteriaMap
+        if (!userExtras.isEmpty()) criteriaMap.put(Criteria.EXTRAS, userExtras);
 
         float minPrice = -1, maxPrice = -1;
         while (minPrice == -1) {
@@ -226,7 +211,7 @@ public class MenuSearcher {
                 Milk milk = Milk.OAT;
                 if (milkString.equals("Full-cream")) {
                     milk = Milk.valueOf("WHOLE");
-                } else if (milkString.equals("")) {
+                } else if (milkString.isEmpty()) {
                     milk = Milk.valueOf("NONE");
                 } else {
                     milkString = milkString.trim().toUpperCase();
@@ -268,7 +253,6 @@ public class MenuSearcher {
 
 
     private static Set<String> loadExtraOptions(String type) {
-        Menu menu = new Menu();
         Path path = Path.of(filePath);
 
         List<String> itemData = null;
@@ -288,8 +272,8 @@ public class MenuSearcher {
                 extra = extra.trim();
                 // check if type of beverage is coffee or tea, and then add the extra option to the coffee or tea extras hash sets accordingly
                 String[] itemInfo = elements[0].split(",");
-                String typeOfBeverage = itemInfo[0];
-                if (typeOfBeverage.equals(type)) {
+                String typeOfBeverage = itemInfo[0].toUpperCase();
+                if (TypeOfBeverage.valueOf(typeOfBeverage).toString().toLowerCase().equals(type.toLowerCase()) && !extra.isBlank()) {
                     extraOptions.add(extra);
                 }
             }
@@ -298,9 +282,27 @@ public class MenuSearcher {
         return extraOptions;
     }
 
+    private static Set<String> getUserExtras(String type) {
+        Set<String> extraOptionsSet = loadExtraOptions(type);
+        // convert the extra sets above to array to be used in Joptionpane input below
+        Object[] extraOptions = extraOptionsSet.toArray();
+
+        Set<String> userExtras = new HashSet<>();
+        // show different extras options depending on the type of beverage chosen
+        String response = (String) JOptionPane.showInputDialog(null, "Which extra/s would you like for your " + type + "? Choose \"Finish\" to complete this selection or \"Skip\" if you don't mind about extra option.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
+        while (!response.equals("Finish") && !response.equals("SKIP: any will do")) {
+            userExtras.add(response);
+            extraOptionsSet.remove(response); // remove the extra option the user just selected off the list of extra offered to the user
+            extraOptionsSet.remove("SKIP: any will do");
+            extraOptions = extraOptionsSet.toArray();
+            response = (String) JOptionPane.showInputDialog(null, "Any other extra would you like for your " + type + "? Choose \"Finish\" to complete this selection.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
+        }
+        return userExtras;
+    }
+
     public static void processSearchResults(DreamBeverage dreamBeverage){
         List<Beverage> matches = menu.findDreamBeverage(dreamBeverage);
-        if(matches.size()>0){ //if the list is not empty
+        if(!matches.isEmpty()){ //if the list is not empty
             //this will map the item names and item ID to the corresponding Item objects
             Map<String, Beverage> options = new HashMap<>();
             //build a text description of the menu items for the user to view
