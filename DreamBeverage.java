@@ -78,7 +78,7 @@ public class DreamBeverage {
                 if(getCriteria(key) instanceof Collection<?> && realBeverage.getCriteria(key) instanceof Collection<?>){
                     Set<Object> intersect = new HashSet<>((Collection<?>) realBeverage.getCriteria(key));
                     intersect.retainAll((Collection<?>) getCriteria(key));
-                    if(intersect.size()==0) return false;
+                    if(intersect.isEmpty()) return false;
                 }
                 else if(realBeverage.getCriteria(key) instanceof Collection<?> && !(getCriteria(key) instanceof Collection<?>)){
                     if(!((Collection<?>) realBeverage.getCriteria(key)).contains(getCriteria(key))) return false;

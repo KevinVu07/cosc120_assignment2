@@ -1,5 +1,5 @@
 public enum Criteria {
-TYPE_OF_BEVERAGE, NUMBER_OF_SHOTS, TEMPERATURE, STEEPING_TIME, MILK_LIST, MILK, EXTRAS, SUGAR;
+TYPE_OF_BEVERAGE, NUMBER_OF_SHOTS, TEMPERATURE, STEEPING_TIME, MILK, EXTRAS, SUGAR;
 
 public String toString() {
     return switch(this){
@@ -7,8 +7,7 @@ public String toString() {
         case NUMBER_OF_SHOTS -> "Number of shots";
         case TEMPERATURE -> "Temperature (celsius)";
         case STEEPING_TIME -> "Steeping time (mins)";
-        case MILK_LIST -> "List of milk options";
-        case MILK -> "Milk choice";
+        case MILK -> "Milk option(s)";
         case EXTRAS -> "Extra/s";
         case SUGAR -> "Sugar";
     };
