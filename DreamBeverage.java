@@ -63,7 +63,15 @@ public class DreamBeverage {
      */
     public String getDescription(){
         StringBuilder description = new StringBuilder();
-        for(Criteria key: criteria.keySet()) description.append("\n").append(key).append(": ").append(getCriteria(key));
+        for(Criteria key: criteria.keySet()) {
+            String criteriaChoice = getCriteria(key).toString();
+            if (key.equals(Criteria.MILK)) {
+                criteriaChoice = getCriteria(Criteria.MILK).toString().replace("[", "").replace("]", "");
+            } else if (key.equals(Criteria.EXTRAS)) {
+                criteriaChoice = getCriteria(Criteria.EXTRAS).toString().replace("[", "").replace("]", "");
+            }
+            description.append("\n").append(key).append(": ").append(criteriaChoice);
+        }
         return description.toString();
     }
 
