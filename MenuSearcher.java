@@ -15,7 +15,7 @@ public class MenuSearcher {
     static ImageIcon icon = new ImageIcon(iconPath);
 
     /**
-     * main method used to allow user to search The Caffeinated Geek database of coffee drink, and place an order request
+     * main method used to allow user to search The Caffeinated Geek database for a beverage that matches their criteria, and place an order request
      * @param args none required
      */
     public static void main(String[] args) {
@@ -24,8 +24,13 @@ public class MenuSearcher {
 
         JOptionPane.showMessageDialog(null, "Welcome to The Caffeinated Geek!\n\tTo start, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
 
-        TypeOfBeverage type = (TypeOfBeverage) JOptionPane.showInputDialog(null,"What type of beverage are you looking for (coffee/tea)?",
-                appName,JOptionPane.QUESTION_MESSAGE,icon,TypeOfBeverage.values(),TypeOfBeverage.TEA);
+        TypeOfBeverage type = (TypeOfBeverage) JOptionPane.showInputDialog(null,"What type of beverage are you looking for (coffee/tea)?", appName,JOptionPane.QUESTION_MESSAGE,icon,TypeOfBeverage.values(),TypeOfBeverage.TEA);
+
+        if (type == null) {
+            JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+            System.exit(0);
+        }
+
 
         // Create a DreamBeverage object dreamBeverage with preferred criteria input from the user
         DreamBeverage dreamBeverage = searchForBeverage(type);
@@ -55,7 +60,10 @@ public class MenuSearcher {
             String[] tempOptions = {"80 degrees: For a mellow, gentler taste", "85 degrees: For slightly sharper than mellow", "90 degrees: Balanced, strong but not too strong", "95 degrees: Strong, but not acidic", "100 degrees: For a bold, strong flavour", "I don't mind"};
             while (temperature < 1) {
                 String response = (String) JOptionPane.showInputDialog(null, "Which temperature would you like for your tea?", appName, JOptionPane.QUESTION_MESSAGE, icon, tempOptions, tempOptions[0]);
-                if (response == null) System.exit(0);
+                if (response == null) {
+                    JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                    System.exit(0);
+                }
                 // use switch case to assign proper values to the temperature variable
                 if (!response.equals("I don't mind")) {
                     switch (response) {
@@ -75,8 +83,11 @@ public class MenuSearcher {
             String[] steepingTimeOptions = {"1", "2", "3", "4", "5", "6", "7", "8", "I don't mind"};
             while (steepingTime < 1) {
                 String response = (String) JOptionPane.showInputDialog(null, "How long would you like the steeping time to be for your tea (minutes)?", appName, JOptionPane.QUESTION_MESSAGE, icon, steepingTimeOptions, steepingTimeOptions[0]);
-                // use switch case to assign proper values to the steeping time variable
-                if (!response.equals("I don't mind")) {
+                if (response == null) {
+                    JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                    System.exit(0);
+                } // use switch case to assign proper values to the steeping time variable
+                else if (!response.equals("I don't mind")) {
                     switch (response) {
                         case "1" -> steepingTime = 1;
                         case "2" -> steepingTime = 2;
@@ -96,13 +107,19 @@ public class MenuSearcher {
 
         // Common criteria for both coffee and tea
         Milk milk = (Milk) JOptionPane.showInputDialog(null, "What milk type would you like in your " + type.toString().toLowerCase() + "?", appName, JOptionPane.QUESTION_MESSAGE, icon, Milk.values(), Milk.WHOLE);
-        if (milk == null) System.exit(0);
+        if (milk == null) {
+            JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+            System.exit(0);
+        }
         // only add the user’s milk selection to the criteria Map if it is not I don't mind.
         if (!milk.equals(Milk.I_DONT_MIND)) criteriaMap.put(Criteria.MILK, milk);
 
         // Sugar choice
         Sugar sugar = (Sugar) JOptionPane.showInputDialog(null, "Would you like sugar with your " + type.toString().toLowerCase() + "?", appName, JOptionPane.QUESTION_MESSAGE, icon, Sugar.values(), Sugar.values()[0]);
-        if (sugar == null) System.exit(0);
+        if (sugar == null) {
+            JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+            System.exit(0);
+        }
         // only add the user’s sugar selection to the criteria Map if it is not I don't mind.
         if (!sugar.equals(Sugar.I_DONT_MIND)) criteriaMap.put(Criteria.SUGAR, sugar);
 
@@ -135,7 +152,7 @@ public class MenuSearcher {
 
     /**
      * method to load all menu items from dataset menu.txt
-     * @return a Menu object that has a list allCoffees containing all the coffees from the menu.txt dataset
+     * @return a Menu object that has a list allBeverages containing all the beverages from the menu.txt dataset
      * this method was sourced and adapted from COSC120 Lecture 4 SeekAGeek.java loadGeeks
      */
     private static Menu loadItems() {
@@ -155,7 +172,9 @@ public class MenuSearcher {
             String[] itemInfo = elements[0].split(","); // [type, menu item ID, menu item name, price, numberOfShots, temperature, steeping time, sugar]
             TypeOfBeverage typeOfBeverage = null;
             try {
-                typeOfBeverage = TypeOfBeverage.valueOf(itemInfo[0].trim().toUpperCase());
+                String type = itemInfo[0].trim().toUpperCase();
+                if (type.equalsIgnoreCase("coffee")) type = "BEVERAGE";
+                typeOfBeverage = TypeOfBeverage.valueOf(type);
             } catch (IllegalArgumentException e) {
                 System.out.println("There is an error with the argument passed in the TypeOfBeverage.valueOf() method");
             }
@@ -253,6 +272,11 @@ public class MenuSearcher {
     }
 
 
+    /**
+     * method to load all the extra options from the dataset for a specific type of beverage
+     * @param type type of beverage to load the extra options for (coffee or tea)
+     * @return a set of extra options (string) that the Caffeinated Geek offers for that specific type of beverage
+     */
     private static Set<String> loadExtraOptions(String type) {
         Path path = Path.of(filePath);
 
@@ -274,7 +298,8 @@ public class MenuSearcher {
                 // check if type of beverage is coffee or tea, and then add the extra option to the coffee or tea extras hash sets accordingly
                 String[] itemInfo = elements[0].split(",");
                 String typeOfBeverage = itemInfo[0].toUpperCase();
-                if (TypeOfBeverage.valueOf(typeOfBeverage).toString().toLowerCase().equals(type.toLowerCase()) && !extra.isBlank()) {
+                if (typeOfBeverage.equalsIgnoreCase("coffee")) typeOfBeverage = "BEVERAGE";
+                if (TypeOfBeverage.valueOf(typeOfBeverage).toString().equalsIgnoreCase(type) && !extra.isBlank()) {
                     extraOptions.add(extra);
                 }
             }
@@ -283,6 +308,11 @@ public class MenuSearcher {
         return extraOptions;
     }
 
+    /**
+     * method to get the user preference about extra/s options for their preferred drink
+     * @param type type of beverage that the user prefers
+     * @return a set of extra options that the user prefers to have for their drink
+     */
     private static Set<String> getUserExtras(String type) {
         Set<String> extraOptionsSet = loadExtraOptions(type);
         // convert the extra sets above to array to be used in Joptionpane input below
@@ -290,19 +320,27 @@ public class MenuSearcher {
 
         Set<String> userExtras = new HashSet<>();
         // show different extras options depending on the type of beverage chosen
-        String response = (String) JOptionPane.showInputDialog(null, "Which extra/s would you like for your " + type.toString().toLowerCase() + "? Choose \"Finish\" to complete this selection or \"I don't mind\" if you don't mind about extra option.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
-        if (response == null) System.exit(0);
+        String response = (String) JOptionPane.showInputDialog(null, "Which extra/s would you like for your " + type.toLowerCase() + "? Choose \"Finish\" to complete this selection or \"I don't mind\" if you don't mind about extra option.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
+        if (response == null) {
+            JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+            System.exit(0);
+        }
         while (!response.equals("Finish") && !response.equals("I don't mind")) {
             userExtras.add(response);
             extraOptionsSet.remove(response); // remove the extra option the user just selected off the list of extra offered to the user
             extraOptionsSet.remove("I don't mind");
             extraOptions = extraOptionsSet.toArray();
-            response = (String) JOptionPane.showInputDialog(null, "Any other extra would you like for your " + type.toString().toLowerCase() + "? Choose \"Finish\" to complete this selection.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
+            response = (String) JOptionPane.showInputDialog(null, "Any other extra would you like for your " + type.toLowerCase() + "? Choose \"Finish\" to complete this selection.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
             if (response == null) System.exit(0);
         }
         return userExtras;
     }
 
+    /**
+     * a method to display the user's matches (if there are any)
+     * @param dreamBeverage a DreamBeverage object representing the user's 'dream' beverage
+     * this method was sourced and adapted from COSC120 Tutorial 7.2 SeekAGeek.java processSearchResults
+     */
     public static void processSearchResults(DreamBeverage dreamBeverage){
         List<Beverage> matches = menu.findDreamBeverage(dreamBeverage);
         if(!matches.isEmpty()){ //if the list is not empty
@@ -324,7 +362,7 @@ public class MenuSearcher {
                 JOptionPane.showMessageDialog(null, "Thank you! Your order has been placed. " +
                         "We will bring your " + chosenBeverage.getGenericFeatures().getCriteria(Criteria.TYPE_OF_BEVERAGE) + " out shortly.", appName, JOptionPane.QUESTION_MESSAGE, icon);
             }
-        } else JOptionPane.showMessageDialog(null, "Unfortunately none of our menu items meet your criteria :(" +
+        } else JOptionPane.showMessageDialog(null, "Unfortunately none of our menu items meet your criteria :( Would you like to order something else?" +
                 "\n\tTo exit, click OK.", appName, JOptionPane.QUESTION_MESSAGE, icon);
         System.exit(0);
     }

@@ -29,6 +29,8 @@ public class DreamBeverage {
         maxPrice=-1;
     }
 
+    // getters and setters
+
     public float getMinPrice() {
         return minPrice;
     }
