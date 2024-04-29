@@ -131,16 +131,26 @@ public class MenuSearcher {
 
         float minPrice = -1, maxPrice = -1;
         while (minPrice == -1) {
+            String response = JOptionPane.showInputDialog(null, "What is the minimum price you would like for your " + type.toString().toLowerCase() + "? ", appName, JOptionPane.QUESTION_MESSAGE);
+            if (response == null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }
             try {
-                minPrice = Float.parseFloat(JOptionPane.showInputDialog(null, "What is the minimum price you would like for your " + type.toString().toLowerCase() + "? ", appName, JOptionPane.QUESTION_MESSAGE));
+                minPrice = Float.parseFloat(response);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid input. The input must be a float. Please try again.");
             }
         }
 
         while (maxPrice < minPrice) {
+            String response = JOptionPane.showInputDialog(null, "What is the maximum price you would like for your " + type.toString().toLowerCase() + " (must be greater than or equal to the minimum price)?", appName, JOptionPane.QUESTION_MESSAGE);
+            if (response == null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }
             try {
-                maxPrice = Float.parseFloat(JOptionPane.showInputDialog(null, "What is the maximum price you would like for your " + type.toString().toLowerCase() + " (must be greater than or equal to the minimum price)?", appName, JOptionPane.QUESTION_MESSAGE));
+                maxPrice = Float.parseFloat(response);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid input. The input must be a float. Please try again.");
             }
@@ -331,7 +341,10 @@ public class MenuSearcher {
             extraOptionsSet.remove("I don't mind");
             extraOptions = extraOptionsSet.toArray();
             response = (String) JOptionPane.showInputDialog(null, "Any other extra would you like for your " + type.toLowerCase() + "? Choose \"Finish\" to complete this selection.", appName, JOptionPane.QUESTION_MESSAGE, icon, extraOptions, extraOptions[0]);
-            if (response == null) System.exit(0);
+            if (response == null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }
         }
         return userExtras;
     }
@@ -354,7 +367,10 @@ public class MenuSearcher {
                 options.put(match.getItemName() + " (" + match.getItemId() + ")", match);
             }
             String order = (String) JOptionPane.showInputDialog(null,infoToShow+"\n\nPlease select which menu item you would like to order",appName, JOptionPane.QUESTION_MESSAGE,icon,options.keySet().toArray(), "");
-            if(order==null) System.exit(0);
+            if(order==null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }
             else{
                 Beverage chosenBeverage = options.get(order);
                 Geek customer = getGeekDetails();
@@ -406,13 +422,19 @@ public class MenuSearcher {
         String name;
         do{
             name = JOptionPane.showInputDialog("Please enter your full name (in format Firstname Surname): ");
-            if(name==null) System.exit(0);
+            if(name==null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }
         } while(!isValidFullName(name));
 
         String phoneNumber;
         do{
             phoneNumber = JOptionPane.showInputDialog("Please enter your phone number (10-digit number in the format 0412345678): ");
-            if(phoneNumber==null) System.exit(0);}
+            if(phoneNumber==null) {
+                JOptionPane.showMessageDialog(null, "Order process is cancelled.");
+                System.exit(0);
+            }}
         while(!isValidPhoneNumber(phoneNumber));
 
         return new Geek(name, phoneNumber);
