@@ -38,6 +38,14 @@ public class MenuSearcher {
         processSearchResults(dreamBeverage);
     }
 
+    /**
+     * obtains user input for the criteria they desire in a beverage including number of shots (for coffee), temperature & steeping time (for tea), milk option, sugar option, extra option, min price, max price
+     * uses this information to search the menu dataset for matching beverages.
+     * the matching beverages are displayed to the user and the user can place an order request. If no matching beverage is found, the user will be notified of that and suggest to order something else.
+     * @param type type of beverage that the user preferred (coffee, tea, etc)
+     * @return a DreamBeverage object representing the user's desired beverage
+     * this method was sourced and adapted from COSC120 Tutorial 7 pt3 FindAPet.java getUserCriteria()
+     */
     private static DreamBeverage searchForBeverage(TypeOfBeverage type) {
         int numberOfShots = 0;
         int temperature = 0;
@@ -373,7 +381,7 @@ public class MenuSearcher {
             }
             else{
                 Beverage chosenBeverage = options.get(order);
-                Geek customer = getGeekDetails();
+                Geek customer = getUserDetails();
                 writeOrderToFile(customer, chosenBeverage, dreamBeverage);
                 JOptionPane.showMessageDialog(null, "Thank you! Your order has been placed. " +
                         "We will bring your " + chosenBeverage.getGenericFeatures().getCriteria(Criteria.TYPE_OF_BEVERAGE) + " out shortly.", appName, JOptionPane.QUESTION_MESSAGE, icon);
@@ -416,8 +424,9 @@ public class MenuSearcher {
     /**
      * a method that get the geek details from user input and store it in a Geek object
      * @return a Geek object that has all the details of the geek who wants to order a drink
+     * this method was sourced and adapted from COSC120 Tutorial 7 pt3 FindAPet.java getUserDetails()
      */
-    private static Geek getGeekDetails(){
+    private static Geek getUserDetails(){
 
         String name;
         do{

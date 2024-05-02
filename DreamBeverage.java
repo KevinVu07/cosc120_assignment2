@@ -1,8 +1,8 @@
 import java.util.*;
 
 public class DreamBeverage {
-    private float minPrice;
-    private float maxPrice;
+    private final float minPrice;
+    private final float maxPrice;
     private final Map<Criteria,Object> criteria;
 
     /**
@@ -35,17 +35,11 @@ public class DreamBeverage {
         return minPrice;
     }
 
-    public void setMinPrice(float minPrice) {
-        this.minPrice = minPrice;
-    }
 
     public float getMaxPrice() {
         return maxPrice;
     }
 
-    public void setMaxPrice(float maxPrice) {
-        this.maxPrice = maxPrice;
-    }
 
     /**
      * @return the entire map of criteria keys, and values
@@ -81,23 +75,27 @@ public class DreamBeverage {
      * compares a DreamBeverage against a real DreamBeverage features
      * @param realBeverage a Beverage object representing a real, registered beverage
      * @return true if the real Beverage's 'dream' features match this DreamBeverage's features
+     * this method is sourced and adapted from COSC120 week 7 lecture 7.2 DreamGeek.java matches()
      */
     public boolean matches(DreamBeverage realBeverage) {
         for(Criteria key : realBeverage.getAllCriteria().keySet()) {
+            // compare each criteria (key - values) that both the realBeverage and the dreamBeverage have to each other)
             if(this.getAllCriteria().containsKey(key)){
+                // if the criteria to compare in both realBeverage and dreamBeverage are a collection (set), check for intersect of the 2 collection
                 if(getCriteria(key) instanceof Collection<?> && realBeverage.getCriteria(key) instanceof Collection<?>){
                     Set<Object> intersect = new HashSet<>((Collection<?>) realBeverage.getCriteria(key));
                     intersect.retainAll((Collection<?>) getCriteria(key));
                     if(intersect.isEmpty()) return false;
                 }
+                // if only the criteria in realBeverage is a collection and the criteria in the dreamBeverage is not, check if the collection contains the singular criteria
                 else if(realBeverage.getCriteria(key) instanceof Collection<?> && !(getCriteria(key) instanceof Collection<?>)){
                     if(!((Collection<?>) realBeverage.getCriteria(key)).contains(getCriteria(key))) return false;
                 }
+                // if only the criteria in dreamBeverage is a collection and the criteria in the realBeverage is not, check if the collection contains the singular criteria
                 else if(!(realBeverage.getCriteria(key) instanceof Collection<?>) && getCriteria(key) instanceof Collection<?>){
                     if(!((Collection<?>) getCriteria(key)).contains(realBeverage.getCriteria(key))) return false;
                 }
-                //SUGGESTION: you could add logic hear to see if a real geek's singular value is contained in a dream geek's collection value
-                //AS PREVIOUSLY DONE: finally, if they're both singular, check for equality
+                // finally, if they're both singular, check for equality
                 else if(!getCriteria(key).equals(realBeverage.getCriteria(key))) return false;
             }
         }
