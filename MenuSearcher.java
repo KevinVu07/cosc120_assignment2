@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 
 public class MenuSearcher {
     // fields
-    private static final String filePath = "./assignment2/menu.txt";
+    private static final String filePath = "./menu.txt";
     private final static String appName = "The Caffeinated Geek";
     private static Menu menu;
-    private final static String iconPath = "./assignment2/icon.png";
+    private final static String iconPath = "./icon.png";
     static ImageIcon icon = new ImageIcon(iconPath);
 
     /**
@@ -398,7 +398,7 @@ public class MenuSearcher {
      * @param chosenBeverage the Coffee object that has the details of the chosen coffee that the geek wants
      */
     private static void writeOrderToFile(Geek geek, Beverage chosenBeverage, DreamBeverage dreamBeverage) {
-        String filePath = "./assignment2/order_" + geek.phoneNumber() + ".txt";
+        String filePath = "./order_" + geek.phoneNumber() + ".txt";
         Path path = Path.of(filePath);
         /* Order details:
         Name: Dr. Walter Shepman
@@ -406,7 +406,12 @@ public class MenuSearcher {
         Item: Mocha (30213)
         Milk: Full-cream */
 
-        String milkChoice = dreamBeverage.getCriteria(Criteria.MILK).toString();
+        String milkChoice = "";
+        if (dreamBeverage.getCriteria(Criteria.MILK) == null) {
+            milkChoice = "Whichever is ok.";
+        } else {
+            milkChoice = dreamBeverage.getCriteria(Criteria.MILK).toString();
+        }
         String lineToWrite = "Order details:\n" +
                 "Name: " + geek.name() + "\n" +
                 "Order number: " + geek.phoneNumber() + "\n" +
